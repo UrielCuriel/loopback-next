@@ -28,7 +28,7 @@ export class TodoListRepository extends DefaultCrudRepository<
     protected todoRepositoryGetter: Getter<TodoRepository>,
   ) {
     super(TodoList, dataSource);
-    this.todos = this._createHasManyRepositoryFactoryFor(
+    this.todos = this.createHasManyRepositoryFactoryFor(
       'todos',
       todoRepositoryGetter,
     );
