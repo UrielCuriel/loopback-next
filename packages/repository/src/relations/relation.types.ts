@@ -13,6 +13,7 @@ export enum RelationType {
   embedsMany = 'embedsMany',
   embedsOne = 'embedsOne',
   hasMany = 'hasMany',
+  hasManyThrough = 'hasManyThrough',
   hasOne = 'hasOne',
   referencesMany = 'referencesMany',
   referencesOne = 'referencesOne',
@@ -69,38 +70,16 @@ export interface HasManyDefinition extends RelationDefinitionBase {
 }
 
 export interface HasManyThroughDefinition extends RelationDefinitionBase {
-  type: RelationType.hasMany;
+  type: RelationType.hasManyThrough;
 
   /**
-   * The through model of this relation.
+   * The foreign key used by the target model.
    *
-   * E.g. when a Customer has many Order instances and a Seller has many Order instances,
-   * then Order is through.
-   */
-  through: TypeResolver<Entity, typeof Entity>;
-
-  /**
-   * The foreign key used by the through model to reference the source model.
-   *
-   * E.g. when a Customer has many Order instances and a Seller has many Order instances,
-   * then keyTo is "customerId".
+   * E.g. when a Customer has many Order instances, then keyTo is "customerId".
    * Note that "customerId" is the default FK assumed by the framework, users
    * can provide a custom FK name by setting "keyTo".
    */
   keyTo?: string;
-
-  /**
-   * The foreign key used by the through model to reference the target model.
-   *
-   * E.g. when a Customer has many Order instances and a Seller has many Order instances,
-   * then keyThrough is "sellerId".
-   */
-  keyThrough?: string;
-
-  /*
-   * The primary key in the target model when using through, e.g. Seller#id.
-   */
-  targetPrimaryKey?: string;
 }
 
 export interface BelongsToDefinition extends RelationDefinitionBase {
