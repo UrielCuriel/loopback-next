@@ -21,22 +21,20 @@ import {Filter, Inclusion, Where} from '../query';
 import {
   BelongsToAccessor,
   BelongsToDefinition,
-  createBelongsToAccessor,
-  createHasManyRepositoryFactory,
-  createHasOneRepositoryFactory,
   HasManyDefinition,
   HasManyRepositoryFactory,
+  HasManyThroughDefinition,
+  HasManyThroughRepositoryFactory,
   HasOneDefinition,
   HasOneRepositoryFactory,
-  includeRelatedModels,
-  InclusionResolver,
+  createBelongsToAccessor,
+  createHasManyRepositoryFactory,
+  createHasManyThroughRepositoryFactory,
+  createHasOneRepositoryFactory,
 } from '../relations';
-import {IsolationLevel, Transaction} from '../transaction';
-import {isTypeResolver, resolveType} from '../type-resolver';
-import {
-  EntityCrudRepository,
-  TransactionalEntityRepository,
-} from './repository';
+
+import {resolveType} from '../type-resolver';
+import {EntityCrudRepository} from './repository';
 
 export namespace juggler {
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -294,11 +292,69 @@ export class DefaultCrudRepository<
 
   /**
    * @deprecated
-   * Function to create a constrained hasOne relation repository factory
+   * Function to create a constrained relation repository factory
    *
-   * @param relationName - Name of the relation defined on the source model
-   * @param targetRepo - Target repository instance
+   * Use `this.createHasManyThroughRepositoryFactoryFor()` instaed
+   *
+   * @param relationName Name of the relation defined on the source model
+   * @param targetRepo Target repository instance
    */
+  protected _createHasManyThroughRepositoryFactoryFor<
+    Target extends Entity,
+    TargetID,
+    ForeignKeyType
+  >(
+    relationName: string,
+    targetRepoGetter: Getter<EntityCrudRepository<Target, TargetID>>,
+  ): HasManyThroughRepositoryFactory<Target, ForeignKeyType> {
+    return this.createHasManyThroughRepositoryFactoryFor(
+      relationName,
+      targetRepoGetter,
+    );
+  }
+
+  /**
+   * Function to create a constrained relation repository factory
+   *
+   * ```ts
+   * class CustomerRepository extends DefaultCrudRepository<
+   *   Customer,
+   *   typeof Customer.prototype.id
+   * > {
+   *   public readonly orders: HasManyThroughRepositoryFactory<Order, typeof Customer.prototype.id>;
+   *
+   *   constructor(
+   *     protected db: juggler.DataSource,
+   *     orderRepository: EntityCrudRepository<Order, typeof Order.prototype.id>,
+   *   ) {
+   *     super(Customer, db);
+   *     this.orders = this._createHasManyThroughRepositoryFactoryFor(
+   *       'orders',
+   *       orderRepository,
+   *     );
+   *   }
+   * }
+   * ```
+   *
+   * @param relationName Name of the relation defined on the source model
+   * @param targetRepo Target repository instance
+   */
+  protected createHasManyThroughRepositoryFactoryFor<
+    Target extends Entity,
+    TargetID,
+    ForeignKeyType
+  >(
+    relationName: string,
+    targetRepoGetter: Getter<EntityCrudRepository<Target, TargetID>>,
+  ): HasManyThroughRepositoryFactory<Target, ForeignKeyType> {
+    const meta = this.entityClass.definition.relations[relationName];
+    return createHasManyThroughRepositoryFactory<
+      Target,
+      TargetID,
+      ForeignKeyType
+    >(meta as HasManyThroughDefinition, targetRepoGetter);
+  }
+
   protected _createHasOneRepositoryFactoryFor<
     Target extends Entity,
     TargetID,
