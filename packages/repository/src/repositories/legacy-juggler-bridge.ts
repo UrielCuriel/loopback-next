@@ -203,11 +203,13 @@ export class DefaultCrudRepository<
   >(
     relationName: string,
     targetRepoGetter: Getter<EntityCrudRepository<Target, TargetID>>,
+    throughRepositoryGetter?: Getter<EntityCrudRepository<Entity, TargetID>>,
   ): HasManyRepositoryFactory<Target, ForeignKeyType> {
-    return this.createHasManyRepositoryFactoryFor(
-      relationName,
-      targetRepoGetter,
-    );
+    return this.createHasManyRepositoryFactoryFor<
+      Target,
+      TargetID,
+      ForeignKeyType
+    >(relationName, targetRepoGetter, throughRepositoryGetter);
   }
 
   /**
@@ -245,11 +247,13 @@ export class DefaultCrudRepository<
   >(
     relationName: string,
     targetRepoGetter: Getter<EntityCrudRepository<Target, TargetID>>,
+    throughRepositoryGetter?: Getter<EntityCrudRepository<Entity, TargetID>>,
   ): HasManyRepositoryFactory<Target, ForeignKeyType> {
     const meta = this.entityClass.definition.relations[relationName];
     return createHasManyRepositoryFactory<Target, TargetID, ForeignKeyType>(
       meta as HasManyDefinition,
       targetRepoGetter,
+      throughRepositoryGetter,
     );
   }
 
