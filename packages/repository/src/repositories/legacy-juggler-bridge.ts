@@ -203,55 +203,13 @@ export class DefaultCrudRepository<
   >(
     relationName: string,
     targetRepoGetter: Getter<EntityCrudRepository<Target, TargetID>>,
+    throughRepositoryGetter?: Getter<EntityCrudRepository<Entity, TargetID>>,
   ): HasManyRepositoryFactory<Target, ForeignKeyType> {
     return this.createHasManyRepositoryFactoryFor<
       Target,
       TargetID,
       ForeignKeyType
-    >(relationName, targetRepoGetter);
-  }
-
-  /**
-   * Function to create a constrained relation repository factory
-   *
-   * @example
-   * ```ts
-   * class CustomerRepository extends DefaultCrudRepository<
-   *   Customer,
-   *   typeof Customer.prototype.id,
-   *   CustomerRelations
-   * > {
-   *   public readonly orders: HasManyRepositoryFactory<Order, typeof Customer.prototype.id>;
-   *
-   *   constructor(
-   *     protected db: juggler.DataSource,
-   *     orderRepository: EntityCrudRepository<Order, typeof Order.prototype.id>,
-   *   ) {
-   *     super(Customer, db);
-   *     this.orders = this._createHasManyRepositoryFactoryFor(
-   *       'orders',
-   *       orderRepository,
-   *     );
-   *   }
-   * }
-   * ```
-   *
-   * @param relationName - Name of the relation defined on the source model
-   * @param targetRepo - Target repository instance
-   */
-  protected createHasManyRepositoryFactoryFor<
-    Target extends Entity,
-    TargetID,
-    ForeignKeyType
-  >(
-    relationName: string,
-    targetRepoGetter: Getter<EntityCrudRepository<Target, TargetID>>,
-  ): HasManyRepositoryFactory<Target, ForeignKeyType> {
-    const meta = this.entityClass.definition.relations[relationName];
-    return createHasManyRepositoryFactory<Target, TargetID, ForeignKeyType>(
-      meta as HasManyDefinition,
-      targetRepoGetter,
-    );
+    >(relationName, targetRepoGetter, throughRepositoryGetter);
   }
 
   /**
@@ -320,8 +278,8 @@ export class DefaultCrudRepository<
   >(
     relationName: string,
     targetRepoGetter: Getter<EntityCrudRepository<Target, TargetID>>,
-    throughRepositoryGetter: Getter<EntityCrudRepository<Through, ThroughID>>,
-  ): HasManyThroughRepositoryFactory<Target, Through, ForeignKeyType> {
+    throughRepositoryGetter?: Getter<EntityCrudRepository<Entity, TargetID>>,
+  ): HasManyRepositoryFactory<Target, ForeignKeyType> {
     const meta = this.entityClass.definition.relations[relationName];
     return createHasManyThroughRepositoryFactory<
       Target,
