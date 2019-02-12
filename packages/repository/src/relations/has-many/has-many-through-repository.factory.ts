@@ -12,25 +12,18 @@ import {EntityCrudRepository} from '../../repositories/repository';
 import {constrainFilter} from '../../repositories/constraint-utils';
 import {isTypeResolver} from '../../type-resolver';
 import {Getter, HasManyThroughDefinition} from '../relation.types';
+import {Where} from '../../query';
 import {
   DefaultHasManyThroughRepository,
   HasManyThroughRepository,
 } from './has-many-through.repository';
-import {Filter, Where} from '../../query';
 
 const debug = debugFactory('loopback:repository:has-many-repository-factory');
 
 export type HasManyThroughRepositoryFactory<
   Target extends Entity,
-  Through extends Entity,
   ForeignKeyType
-> = (fkValue: ForeignKeyType) => HasManyThroughRepository<Target, Through>;
-
-export interface AdvancedConstraint<T extends Entity> {
-  dataObject: DataObject<T>;
-  filter: Filter<T>;
-  where: Where<T>;
-}
+> = (fkValue: ForeignKeyType) => HasManyThroughRepository<Target>;
 
 /**
  * Enforces a constraint on a repository based on a relationship contract
@@ -55,19 +48,34 @@ export function createHasManyThroughRepositoryFactory<
   relationMetadata: HasManyThroughDefinition,
   targetRepositoryGetter: Getter<EntityCrudRepository<Target, TargetID>>,
   throughRepositoryGetter: Getter<EntityCrudRepository<Through, ThroughID>>,
-): HasManyThroughRepositoryFactory<Target, Through, ForeignKeyType> {
+): HasManyThroughRepositoryFactory<Target, ForeignKeyType> {
   const meta = resolveHasManyThroughMetadata(relationMetadata);
   debug('Resolved HasMany relation metadata: %o', meta);
   return function(fkValue?: ForeignKeyType) {
-    async function getAdvancedConstraint(
+    async function getConstraint(
       targetInstance: Target,
-    ): Promise<AdvancedConstraint<Target | Through>> {
-      return createAdvancedConstraint<
-        Target,
-        Through,
-        ThroughID,
-        ForeignKeyType
-      >(targetInstance, meta, throughRepositoryGetter, fkValue);
+    ): Promise<DataObject<Through> | Where<Through>> {
+      // tslint:disable-next-line:no-any
+      let constraint: any = {[meta.keyTo]: fkValue};
+      if (targetInstance) {
+        constraint[meta.targetFkName] =
+          targetInstance[meta.targetPrimaryKey as keyof Target];
+      } else {
+        const throughRepo = await throughRepositoryGetter();
+        const throughInstances = await throughRepo.find(
+          constrainFilter(undefined, constraint),
+        );
+        if (!throughInstances.length) {
+          const id = 'through constraint ' + JSON.stringify(constraint);
+          throw new EntityNotFoundError(throughRepo.entityClass, id);
+        }
+        constraint = {
+          or: throughInstances.map((throughInstance: Through) => {
+            return {id: throughInstance[meta.targetFkName as keyof Through]};
+          }),
+        };
+      }
+      return constraint as DataObject<Through> | Where<Through>;
     }
     return new DefaultHasManyThroughRepository<
       Target,
@@ -76,63 +84,15 @@ export function createHasManyThroughRepositoryFactory<
       Through,
       ThroughID,
       EntityCrudRepository<Through, ThroughID>
-    >(targetRepositoryGetter, throughRepositoryGetter, getAdvancedConstraint);
+    >(targetRepositoryGetter, throughRepositoryGetter, getConstraint);
   };
 }
 
 type HasManyThroughResolvedDefinition = HasManyThroughDefinition & {
   keyTo: string;
-  keyThrough: string;
+  targetFkName: string;
   targetPrimaryKey: string;
 };
-
-async function createAdvancedConstraint<
-  Target extends Entity,
-  Through extends Entity,
-  ThroughID,
-  ForeignKeyType
->(
-  targetInstance: Target,
-  meta: HasManyThroughResolvedDefinition,
-  throughRepositoryGetter: Getter<EntityCrudRepository<Through, ThroughID>>,
-  fkValue?: ForeignKeyType,
-): Promise<AdvancedConstraint<Target | Through>> {
-  // tslint:disable-next-line:no-any
-  const sourceFkName = meta.keyTo;
-  const targetFkName = meta.keyThrough;
-  const advancedConstraint: any = {
-    dataObject: {[sourceFkName]: fkValue} as DataObject<Through>,
-    filter: {},
-    where: {},
-  };
-  if (targetInstance) {
-    // through constraint
-    advancedConstraint.dataObject[targetFkName] =
-      targetInstance[meta.targetPrimaryKey as keyof Target];
-    advancedConstraint.where = {where: advancedConstraint.dataObject};
-  } else {
-    // target constraint
-    const throughRepo = await throughRepositoryGetter();
-    const throughInstances = await throughRepo.find(
-      constrainFilter(undefined, advancedConstraint.dataObject),
-    );
-    if (!throughInstances.length) {
-      const id =
-        'through constraint ' + JSON.stringify(advancedConstraint.dataObject);
-      throw new EntityNotFoundError(throughRepo.entityClass, id);
-    }
-    advancedConstraint.dataObject = {};
-    advancedConstraint.where = {
-      or: throughInstances.map((throughInstance: Through) => {
-        return {id: throughInstance[targetFkName as keyof Through]};
-      }),
-    };
-  }
-  advancedConstraint.filter = {
-    where: advancedConstraint.where,
-  };
-  return advancedConstraint as AdvancedConstraint<Target | Through>;
-}
 
 /**
  * Resolves given hasMany metadata if target is specified to be a resolver.
@@ -154,7 +114,7 @@ function resolveHasManyThroughMetadata(
 
   if (
     relationMeta.keyTo ||
-    relationMeta.keyThrough ||
+    relationMeta.targetFkName ||
     relationMeta.targetPrimaryKey
   ) {
     // The explict cast is needed because of a limitation of type inference
@@ -181,21 +141,19 @@ function resolveHasManyThroughMetadata(
     throughModel,
   );
 
-  const sourceFkName =
-    relationMeta.keyTo || camelCase(sourceModel.modelName + '_id');
-  const hasSourceFkProperty =
+  const defaultFkName = camelCase(sourceModel.modelName + '_id');
+  const hasDefaultFkProperty =
     throughModel.definition &&
     throughModel.definition.properties &&
-    throughModel.definition.properties[sourceFkName];
-  if (!hasSourceFkProperty) {
+    throughModel.definition.properties[defaultFkName];
+  if (!hasDefaultFkProperty) {
     const reason = `through model ${
       targetModel.name
-    } is missing definition of default foreign key ${sourceFkName}`;
+    } is missing definition of default foreign key ${defaultFkName}`;
     throw new InvalidRelationError(reason, relationMeta);
   }
 
-  const targetFkName =
-    relationMeta.keyThrough || camelCase(targetModel.modelName + '_id');
+  const targetFkName = camelCase(targetModel.modelName + '_id');
   const hasTargetFkName =
     throughModel.definition &&
     throughModel.definition.properties &&
@@ -216,8 +174,8 @@ function resolveHasManyThroughMetadata(
   }
 
   return Object.assign(relationMeta, {
-    keyTo: sourceFkName,
-    keyThrough: targetFkName,
+    keyTo: defaultFkName,
+    targetFkName,
     targetPrimaryKey,
   });
 }

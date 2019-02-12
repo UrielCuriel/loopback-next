@@ -69,12 +69,7 @@ export class DefaultHasManyRepository<
    */
   constructor(
     public getTargetRepository: Getter<TargetRepository>,
-    public getConstraint: (
-      targetInstance?: TargetEntity,
-    ) => Promise<DataObject<TargetEntity>>,
-    public getThroughRepository?: Getter<
-      EntityCrudRepository<Entity, TargetID>
-    >,
+    public constraint: DataObject<TargetEntity>,
   ) {}
 
   async create(
@@ -82,19 +77,10 @@ export class DefaultHasManyRepository<
     options?: Options,
   ): Promise<TargetEntity> {
     const targetRepository = await this.getTargetRepository();
-    const targetInstance = await targetRepository.create(
-      this.getThroughRepository
-        ? targetModelData
-        : constrainDataObject(targetModelData, await this.getConstraint()),
+    return targetRepository.create(
+      constrainDataObject(targetModelData, this.constraint),
       options,
     );
-    if (this.getThroughRepository) {
-      const throughRepository = await this.getThroughRepository();
-      await throughRepository.create(
-        constrainDataObject({}, await this.getConstraint(targetInstance)),
-      );
-    }
-    return targetInstance;
   }
 
   async find(
@@ -103,7 +89,7 @@ export class DefaultHasManyRepository<
   ): Promise<TargetEntity[]> {
     const targetRepository = await this.getTargetRepository();
     return targetRepository.find(
-      constrainFilter(filter, await this.getConstraint()),
+      constrainFilter(filter, this.constraint),
       options,
     );
   }
@@ -111,9 +97,7 @@ export class DefaultHasManyRepository<
   async delete(where?: Where<TargetEntity>, options?: Options): Promise<Count> {
     const targetRepository = await this.getTargetRepository();
     return targetRepository.deleteAll(
-      constrainWhere(where, (await this.getConstraint()) as Where<
-        TargetEntity
-      >),
+      constrainWhere(where, this.constraint as Where<TargetEntity>),
       options,
     );
   }
@@ -125,10 +109,8 @@ export class DefaultHasManyRepository<
   ): Promise<Count> {
     const targetRepository = await this.getTargetRepository();
     return targetRepository.updateAll(
-      constrainDataObject(dataObject, await this.getConstraint()),
-      constrainWhere(where, (await this.getConstraint()) as Where<
-        TargetEntity
-      >),
+      constrainDataObject(dataObject, this.constraint),
+      constrainWhere(where, this.constraint as Where<TargetEntity>),
       options,
     );
   }

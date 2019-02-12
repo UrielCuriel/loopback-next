@@ -80,7 +80,7 @@ describe('createHasManyThroughRepositoryFactory', () => {
         Getter.fromValue(customerRepo),
         Getter.fromValue(orderRepo),
       ),
-    ).to.throw(/through model Customer is missing.*foreign key companyId/);
+    ).to.throw(/target model Customer is missing.*foreign key companyId/);
   });
 
   /*------------- HELPERS ---------------*/
