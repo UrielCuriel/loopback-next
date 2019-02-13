@@ -37,6 +37,11 @@ export class CustomerRepository extends DefaultCrudRepository<
     Order,
     typeof Customer.prototype.id
   >;
+  public readonly sellers: HasManyThroughRepositoryFactory<
+    Seller,
+    Order,
+    typeof Customer.prototype.id
+  >;
 
   constructor(
     @inject('datasources.db') protected db: juggler.DataSource,
@@ -55,6 +60,11 @@ export class CustomerRepository extends DefaultCrudRepository<
     this.address = this.createHasOneRepositoryFactoryFor(
       'address',
       addressRepositoryGetter,
+    );
+    this.sellers = this.createHasManyThroughRepositoryFactoryFor(
+      'sellers',
+      sellerRepositoryGetter,
+      orderRepositoryGetter,
     );
     this.sellers = this.createHasManyThroughRepositoryFactoryFor(
       'sellers',
