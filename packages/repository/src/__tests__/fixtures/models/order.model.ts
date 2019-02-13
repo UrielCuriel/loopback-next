@@ -4,8 +4,8 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import {belongsTo, Entity, model, property} from '../../..';
-import {Customer, CustomerWithRelations} from './customer.model';
-import {Shipment, ShipmentWithRelations} from './shipment.model';
+import {Customer} from './customer.model';
+import {Seller} from './seller.model';
 
 @model()
 export class Order extends Entity {
@@ -17,9 +17,9 @@ export class Order extends Entity {
 
   @property({
     type: 'string',
-    required: true,
+    required: false,
   })
-  description: string;
+  description?: string;
 
   @property({
     type: 'boolean',
@@ -30,13 +30,8 @@ export class Order extends Entity {
   @belongsTo(() => Customer)
   customerId: number;
 
-  @belongsTo(() => Shipment, {name: 'shipment'})
-  shipment_id: number;
-}
-
-export interface OrderRelations {
-  customer?: CustomerWithRelations;
-  shipment?: ShipmentWithRelations;
+  @belongsTo(() => Seller)
+  sellerId: number;
 }
 
 export type OrderWithRelations = Order & OrderRelations;

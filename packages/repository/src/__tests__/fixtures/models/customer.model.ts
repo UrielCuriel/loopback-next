@@ -3,9 +3,10 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {belongsTo, Entity, hasMany, hasOne, model, property} from '../../..';
-import {Address, AddressWithRelations} from './address.model';
-import {Order, OrderWithRelations} from './order.model';
+import {Entity, hasMany, model, property, hasOne} from '../../..';
+import {Order} from './order.model';
+import {Address} from './address.model';
+import {Seller} from './seller.model';
 
 @model()
 export class Customer extends Entity {
@@ -22,6 +23,9 @@ export class Customer extends Entity {
 
   @hasMany(() => Order)
   orders: Order[];
+
+  @hasMany(() => Seller, {through: () => Order})
+  sellers: Seller[];
 
   @hasOne(() => Address)
   address: Address;
