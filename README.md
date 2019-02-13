@@ -1,116 +1,172 @@
-# loopback-next
+# @loopback/repository
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/strongloop/loopback)
-[![Travis Build Status](https://travis-ci.org/strongloop/loopback-next.svg?branch=master)](https://travis-ci.org/strongloop/loopback-next)
-[![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/q8vp7wrdn2ak6801/branch/master?svg=true)](https://ci.appveyor.com/project/strongloop/loopback-next/branch/master)
-[![Coverage Status](https://coveralls.io/repos/github/strongloop/loopback-next/badge.svg?branch=master)](https://coveralls.io/github/strongloop/loopback-next?branch=master)
-[![Greenkeeper badge](https://badges.greenkeeper.io/strongloop/loopback-next.svg)](https://greenkeeper.io/)
+This module provides a common set of interfaces for interacting with databases.
 
-LoopBack makes it easy to build modern applications that require complex
-integrations.
+## Overview
 
-- Fast, small, powerful, extensible core
-- Generate real APIs with a single command
-- Define your data and endpoints with OpenAPI
-- No maintenance of generated code
+**NOTE**: This module is experimental and evolving. It is likely going to be
+refactored and decomposed into multiple modules as we refine the story based on
+the legacy `loopback-datasource-juggler` and connector modules from LoopBack
+3.x.
 
-## Status: General Availability
-
-LoopBack 4 GA (General Availability) has been released in October 2018, read
-more in [the announcement post](http://strongloop.com/strongblog/loopback-4-ga).
-
-The documentation website is https://loopback.io/doc/en/lb4/.
-
-Learn about the latest and greatest
-[features and technologies in LoopBack 4](https://loopback.io/doc/en/lb4/Crafting-LoopBack-4.html)
-by using it for your next project. Start by having a look at
-[Getting Started](https://loopback.io/doc/en/lb4/Getting-started.html).
-
-Check the
-[API documentation](https://apidocs.loopback.io/@loopback%2fdocs/apidocs.html)
-for all the API usages in each package.
-
-[LoopBack 3](https://loopback.io/doc/en/lb3/) became active LTS version, and
-[LoopBack 2](https://loopback.io/doc/en/lb2/) became maintenance LTS version.
-
-| Version    | Status          | Published | EOL                  |
-| ---------- | --------------- | --------- | -------------------- |
-| LoopBack 4 | Current         | Oct 2018  | Apr 2021 _(minimum)_ |
-| Loopback 3 | Active LTS      | Dec 2016  | Dec 2019             |
-| Loopback 2 | Maintenance LTS | Jul 2014  | Apr 2019             |
-
-Please refer to our
-[Long Term Support Policy](https://loopback.io/doc/en/contrib/Long-term-support.html)
-for more details.
+This module provides data access facilities to various databases and services as
+well as the constructs for modeling and accessing those data.
 
 ## Installation
 
-Make sure you have the following installed:
-
-- [Node.js](https://nodejs.org/en/download/) >= 8.9.0
-
-Install LoopBack 4 CLI to help create new projects as follows:
-
-```shell
-npm i -g @loopback/cli
+```sh
+npm install --save @loopback/repository
 ```
 
-To create your first LoopBack 4 application, see
-[Getting Started](http://loopback.io/doc/en/lb4/Getting-started.html).
+## Basic use
 
-## Documentation
+At the moment, we only have implementations of `Repository` based on LoopBack
+3.x `loopback-datasource-juggler` and connectors. The following steps illustrate
+how to define repositories and use them with controllers.
 
-- [Official documentation](http://loopback.io/doc/en/lb4/)
-- [API documentation](http://apidocs.loopback.io/#LoopBack4)
-- [FAQ](http://loopback.io/doc/en/lb4/FAQ.html)
-- [LoopBack 3 vs LoopBack 4](http://loopback.io/doc/en/lb4/LoopBack-3.x.html)
-- [Tutorials and examples](http://loopback.io/doc/en/lb4/Examples-and-tutorials.html)
+### Defining a legacy datasource and a model
 
-## Contributing
+The repository module provides APIs to define LoopBack 3.x data sources and
+models. For example,
 
-See the following resources to get you started:
+```ts
+// src/datasources/db.datasource.ts
+import {juggler} from '@loopback/repository';
 
-- [Contributing Guidelines](./docs/CONTRIBUTING.md)
-- [Monorepo overview](./docs/site/MONOREPO.md)
-- [Developing LoopBack](./docs/site/DEVELOPING.md)
+export const db: juggler.DataSource = new juggler.DataSource({
+  name: 'db',
+  connector: 'memory',
+});
+```
 
-You can join the team by posting a comment to
-[issue #110](https://github.com/strongloop/loopback-next/issues/110).
+```ts
+// src/models/note.model.ts
+import {model, Entity, property} from '@loopback/repository';
 
-## Team
+@model()
+export class Note extends Entity {
+  @property({id: true})
+  id: string;
+  @property()
+  title: string;
+  @property()
+  content: string;
+}
+```
 
-### Project Architects
+**NOTE**: There is no declarative support for data source and model yet in
+LoopBack 4. These constructs need to be created programmatically as illustrated
+above.
 
-|                  Raymond Feng                   |            Miroslav Bajtos            |           Ritchie Martori           |
-| :---------------------------------------------: | :-----------------------------------: | :---------------------------------: |
-| [![raymondfeng]](http://github.com/raymondfeng) | [![bajtos]](http://github.com/bajtos) | [![ritch]](http://github.com/ritch) |
+### Defining a repository
 
-### Project Maintainers
+A repository can be created by extending `DefaultCrudRepository` and using
+dependency injection to resolve the datasource.
 
-|                                                  |                                                  |                                                            |
-| :----------------------------------------------: | :----------------------------------------------: | :--------------------------------------------------------: |
-|                  Biniam Admikew                  |                    Diana Lau                     |                         Janny Hou                          |
-|    [![b-admike]](http://github.com/b-admike)     |      [![dhmlau]](http://github.com/dhmlau)       |         [![jannyhou]](http://github.com/jannyHou)          |
-|                    Hage Yaapa                    |                 Nora Abdelgadir                  |                       Mario Estrada                        |
-| [![hacksparrow]](https://github.com/hacksparrow) | [![nabdelgadir]](https://github.com/nabdelgadir) | [![marioestradarosa]](https://github.com/marioestradarosa) |
-|                   Hugo Da Roit                   |                 Dominique Emond                  |                                                            |
-|        [![yaty]](https://github.com/yaty)        |     [![emonddr]](https://github.com/emonddr)     |                                                            |
+```ts
+// src/repositories/note.repository.ts
+import {DefaultCrudRepository, DataSourceType} from '@loopback/repository';
+import {Note} from '../models';
+import {inject} from '@loopback/core';
+
+export class NoteRepository extends DefaultCrudRepository<
+  Note,
+  typeof Note.prototype.id
+> {
+  constructor(@inject('datasources.db') protected dataSource: DataSourceType) {
+    super(Note, dataSource);
+  }
+}
+```
+
+### Defining a controller
+
+Controllers serve as handlers for API requests. We declare controllers as
+classes with optional dependency injection by decorating constructor parameters
+or properties.
+
+```ts
+// src/controllers/note.controller.ts
+import {repository} from '@loopback/repository';
+import {NoteRepository} from '../repositories';
+import {Note} from '../models';
+import {post, requestBody, get, param} from '@loopback/openapi-v3';
+
+export class NoteController {
+  constructor(
+    // Use constructor dependency injection to set up the repository
+    @repository(NoteRepository) public noteRepo: NoteRepository,
+  ) {}
+
+  // Create a new note
+  @post('/note')
+  create(@requestBody() data: Note) {
+    return this.noteRepo.create(data);
+  }
+
+  // Find notes by title
+  @get('/note/{title}')
+  findByTitle(@param.path.string('title') title: string) {
+    return this.noteRepo.find({where: {title}});
+  }
+}
+```
+
+### Run the controller and repository together
+
+#### Using the Repository Mixin for Application
+
+A Repository Mixin is available for Application that provides convenience
+methods for binding and instantiating a repository class. Bound instances can be
+used anywhere in your application using Dependency Injection. The
+`.repository(RepositoryClass)` function can be used to bind a repository class
+to an Application. The mixin will also instantiate any repositories declared by
+a component in its constructor using the `repositories` key.
+
+Repositories will be bound to the key `repositories.RepositoryClass` where
+`RepositoryClass` is the name of the Repository class being bound.
+
+We'll use `BootMixin` on top of `RepositoryMixin` so that Repository bindings
+can be taken care of automatically at boot time before the application starts.
+
+```ts
+import {BootMixin} from '@loopback/boot';
+import {ApplicationConfig} from '@loopback/core';
+import {RepositoryMixin} from '@loopback/repository';
+import {RestApplication} from '@loopback/rest';
+import {db} from './datasources/db.datasource';
+
+export class RepoApplication extends BootMixin(
+  RepositoryMixin(RestApplication),
+) {
+  constructor(options?: ApplicationConfig) {
+    super(options);
+    this.projectRoot = __dirname;
+    this.dataSource(db);
+  }
+}
+```
+
+## Related resources
+
+- <https://martinfowler.com/eaaCatalog/repository.html>
+- <https://msdn.microsoft.com/en-us/library/ff649690.aspx>
+- <http://docs.spring.io/spring-data/data-commons/docs/2.0.0.M3/reference/html/#repositories>
+
+## Contributions
+
+- [Guidelines](https://github.com/strongloop/loopback-next/blob/master/docs/CONTRIBUTING.md)
+- [Join the team](https://github.com/strongloop/loopback-next/issues/110)
+
+## Tests
+
+Run `npm test` from the root folder.
+
+## Contributors
 
 See
 [all contributors](https://github.com/strongloop/loopback-next/graphs/contributors).
 
 ## License
 
-[MIT](LICENSE)
-
-[raymondfeng]: https://avatars0.githubusercontent.com/u/540892?v=3&s=60
-[bajtos]: https://avatars2.githubusercontent.com/u/1140553?v=3&s=60
-[ritch]: https://avatars2.githubusercontent.com/u/462228?v=3&s=60
-[b-admike]: https://avatars0.githubusercontent.com/u/13950637?v=3&s=60
-[dhmlau]: https://avatars2.githubusercontent.com/u/25489897?v=3&s=60
-[jannyhou]: https://avatars2.githubusercontent.com/u/12554153?v=3&s=60
-[hacksparrow]: https://avatars2.githubusercontent.com/u/950112?v=3&s=60
-[nabdelgadir]: https://avatars0.githubusercontent.com/u/42985749?v=3&s=60
-[marioestradarosa]: https://avatars2.githubusercontent.com/u/4633823?v=3&s=60
-[yaty]: https://avatars3.githubusercontent.com/u/11981803?v=3&s=60
-[emonddr]: https://avatars0.githubusercontent.com/u/6864736??v=3&s=60
+MIT
