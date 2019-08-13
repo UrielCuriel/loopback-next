@@ -1,4 +1,4 @@
-// Copyright IBM Corp. 2017,2018. All Rights Reserved.
+// Copyright IBM Corp. 2018,2019. All Rights Reserved.
 // Node module: @loopback/example-todo
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
@@ -15,7 +15,7 @@ import {
 import {EntityCrudRepository} from '../../repositories/repository';
 
 /**
- * CRUD operations for a target repository of a HasMany relation
+ * CRUD operations for a target repository of a HasManyThrough relation
  */
 export interface HasManyThroughRepository<
   Target extends Entity,
@@ -23,10 +23,10 @@ export interface HasManyThroughRepository<
 > {
   /**
    * Create a target model instance
-   * @param targetModelData The target model data
-   * @param throughModelData The through model data
-   * @param options Options for the operation
-   * @param throughOptions Options passed to create through
+   * @param targetModelData - The target model data
+   * @param throughModelData - The through model data
+   * @param options - Options for the operation
+   * @param throughOptions - Options passed to create through
    * @returns A promise which resolves to the newly created target model instance
    */
   create(
@@ -37,22 +37,22 @@ export interface HasManyThroughRepository<
   ): Promise<Target>;
   /**
    * Find target model instance(s)
-   * @param filter A filter object for where, order, limit, etc.
-   * @param options Options for the operation
+   * @param filter - A filter object for where, order, limit, etc.
+   * @param options - Options for the operation
    * @returns A promise which resolves with the found target instance(s)
    */
   find(filter?: Filter<Target>, options?: Options): Promise<Target[]>;
   /**
    * Delete multiple target model instances
-   * @param where Instances within the where scope are deleted
+   * @param where - Instances within the where scope are deleted
    * @param options
    * @returns A promise which resolves the deleted target model instances
    */
   delete(where?: Where<Target>, options?: Options): Promise<Count>;
   /**
    * Patch multiple target model instances
-   * @param dataObject The fields and their new values to patch
-   * @param where Instances within the where scope are patched
+   * @param dataObject - The fields and their new values to patch
+   * @param where - Instances within the where scope are patched
    * @param options
    * @returns A promise which resolves the patched target model instances
    */
@@ -72,10 +72,12 @@ export class DefaultHasManyThroughRepository<
   ThroughRepository extends EntityCrudRepository<ThroughEntity, ThroughID>
 > implements HasManyThroughRepository<TargetEntity, ThroughEntity> {
   /**
-   * Constructor of DefaultHasManyEntityCrudRepository
-   * @param getTargetRepository the getter of the related target model repository instance
-   * @param constraint the key value pair representing foreign key name to constrain
-   * the target repository instance
+   * Constructor of DefaultHasManyThroughEntityCrudRepository
+   * @param getTargetRepository - the getter of the related target model repository instance
+   * @param getThroughRepository - the getter of the related through model repository instance
+   * @param getTargetConstraint - the getter of the constraint used to query target
+   * @param getThroughConstraint - the getter of the constraint used to query through
+   * the hasManyThrough instance
    */
   constructor(
     public getTargetRepository: Getter<TargetRepository>,
