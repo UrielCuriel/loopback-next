@@ -70,6 +70,7 @@ export interface HasManyDefinition extends RelationDefinitionBase {
 
 export interface HasManyThroughDefinition extends RelationDefinitionBase {
   type: RelationType.hasMany;
+  targetsMany: true;
 
   /**
    * The through model of this relation.
