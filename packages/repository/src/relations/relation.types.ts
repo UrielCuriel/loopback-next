@@ -136,6 +136,7 @@ export interface HasOneDefinition extends RelationDefinitionBase {
  */
 export type RelationMetadata =
   | HasManyDefinition
+  | HasManyThroughDefinition
   | BelongsToDefinition
   | HasOneDefinition
   // TODO(bajtos) add other relation types and remove RelationDefinitionBase once

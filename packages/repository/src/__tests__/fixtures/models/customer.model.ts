@@ -6,6 +6,7 @@
 import {belongsTo, Entity, hasMany, hasOne, model, property} from '../../..';
 import {Address, AddressWithRelations} from './address.model';
 import {Order, OrderWithRelations} from './order.model';
+import {Seller} from './seller.model';
 
 @model()
 export class Customer extends Entity {
@@ -22,6 +23,9 @@ export class Customer extends Entity {
 
   @hasMany(() => Order)
   orders: Order[];
+
+  @hasMany(() => Seller, {through: () => Order})
+  sellers: Seller[];
 
   @hasOne(() => Address)
   address: Address;

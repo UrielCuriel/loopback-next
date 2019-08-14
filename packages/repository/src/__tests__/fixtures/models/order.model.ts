@@ -6,6 +6,7 @@
 import {belongsTo, Entity, model, property} from '../../..';
 import {Customer, CustomerWithRelations} from './customer.model';
 import {Shipment, ShipmentWithRelations} from './shipment.model';
+import {Seller} from './seller.model';
 
 @model()
 export class Order extends Entity {
@@ -29,6 +30,9 @@ export class Order extends Entity {
 
   @belongsTo(() => Customer)
   customerId: number;
+
+  @belongsTo(() => Seller)
+  sellerId: number;
 
   @belongsTo(() => Shipment, {name: 'shipment'})
   shipment_id: number;

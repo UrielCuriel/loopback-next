@@ -8,12 +8,14 @@ import {
   BelongsToAccessor,
   DefaultCrudRepository,
   HasManyRepositoryFactory,
+  HasManyThroughRepositoryFactory,
   juggler,
   repository,
 } from '../../..';
 import {HasOneRepositoryFactory} from '../../../';
-import {Address, Customer, CustomerRelations, Order} from '../models';
+import {Address, Customer, CustomerRelations, Order, Seller} from '../models';
 import {AddressRepository} from './address.repository';
+import {SellerRepository} from './seller.repository';
 import {OrderRepository} from './order.repository';
 
 export class CustomerRepository extends DefaultCrudRepository<
@@ -33,6 +35,11 @@ export class CustomerRepository extends DefaultCrudRepository<
     Customer,
     typeof Customer.prototype.id
   >;
+  public readonly sellers: HasManyThroughRepositoryFactory<
+    Seller,
+    Order,
+    typeof Customer.prototype.id
+  >;
   public readonly parent: BelongsToAccessor<
     Customer,
     typeof Customer.prototype.id
@@ -44,10 +51,17 @@ export class CustomerRepository extends DefaultCrudRepository<
     orderRepositoryGetter: Getter<OrderRepository>,
     @repository.getter('AddressRepository')
     addressRepositoryGetter: Getter<AddressRepository>,
+    @repository.getter('SellerRepository')
+    sellerRepositoryGetter: Getter<SellerRepository>,
   ) {
     super(Customer, db);
     this.orders = this.createHasManyRepositoryFactoryFor(
       'orders',
+      orderRepositoryGetter,
+    );
+    this.sellers = this.createHasManyThroughRepositoryFactoryFor(
+      'sellers',
+      sellerRepositoryGetter,
       orderRepositoryGetter,
     );
     this.address = this.createHasOneRepositoryFactoryFor(
