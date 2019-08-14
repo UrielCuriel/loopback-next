@@ -14,6 +14,7 @@ import {
   createHasManyThroughRepositoryFactory,
   juggler,
 } from '../../..';
+import {TypeResolver} from '../../../type-resolver';
 
 describe('createHasManyThroughRepositoryFactory', () => {
   let customerRepo: CustomerRepository;
@@ -81,6 +82,37 @@ describe('createHasManyThroughRepositoryFactory', () => {
         Getter.fromValue(orderRepo),
       ),
     ).to.throw(/through model Customer is missing.*foreign key companyId/);
+  });
+
+  it('rejects relations with missing "through"', () => {
+    const relationMeta = givenHasManyThroughDefinition({
+      target: () => Customer,
+      through: undefined,
+    });
+    expect(() =>
+      createHasManyThroughRepositoryFactory(
+        relationMeta,
+        Getter.fromValue(customerRepo),
+        Getter.fromValue(orderRepo),
+      ),
+    ).to.throw(/through must be a type resolver/);
+  });
+
+  it('rejects relations with "through" that is not a type resolver', () => {
+    const relationMeta = givenHasManyThroughDefinition({
+      target: () => Customer,
+    });
+    relationMeta.through = (true as unknown) as TypeResolver<
+      Entity,
+      typeof Entity
+    >;
+    expect(() =>
+      createHasManyThroughRepositoryFactory(
+        relationMeta,
+        Getter.fromValue(customerRepo),
+        Getter.fromValue(orderRepo),
+      ),
+    ).to.throw(/through must be a type resolver/);
   });
 
   /*------------- HELPERS ---------------*/
