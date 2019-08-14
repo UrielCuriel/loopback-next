@@ -3,9 +3,9 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {Entity, hasMany, model, property, hasOne} from '../../..';
-import {Order} from './order.model';
-import {Address} from './address.model';
+import {belongsTo, Entity, hasMany, hasOne, model, property} from '../../..';
+import {Address, AddressWithRelations} from './address.model';
+import {Order, OrderWithRelations} from './order.model';
 import {Seller} from './seller.model';
 
 @model()

@@ -141,6 +141,7 @@ describe('createHasManyThroughRepositoryFactory', () => {
 
     const defaults: HasManyThroughDefinition = {
       type: RelationType.hasMany,
+      targetsMany: true,
       name: 'customers',
       target: () => Customer,
       through: () => Order,

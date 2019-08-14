@@ -137,6 +137,8 @@ export interface HasOneDefinition extends RelationDefinitionBase {
  * A union type describing all possible Relation metadata objects.
  */
 export type RelationMetadata =
+  | HasManyDefinition
+  | HasManyThroughDefinition
   | BelongsToDefinition
   | HasManyDefinition
   | HasManyThroughDefinition

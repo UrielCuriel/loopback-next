@@ -7,6 +7,9 @@ import {expect} from '@loopback/testlab';
 import {
   BelongsToAccessor,
   BelongsToDefinition,
+  createBelongsToAccessor,
+  createHasManyRepositoryFactory,
+  createHasManyThroughRepositoryFactory,
   DefaultCrudRepository,
   Entity,
   EntityCrudRepository,
@@ -15,18 +18,17 @@ import {
   HasManyDefinition,
   HasManyRepository,
   HasManyRepositoryFactory,
+  HasManyThroughRepository,
   HasManyThroughDefinition,
   HasManyThroughRepositoryFactory,
+  juggler,
   ModelDefinition,
   RelationType,
   createBelongsToAccessor,
   createHasManyRepositoryFactory,
   juggler,
 } from '../../..';
-import {
-  createHasManyThroughRepositoryFactory,
-  HasManyThroughRepository,
-} from '../../../relations';
+import {Seller} from '../../fixtures/models';
 
 // Given a Customer and Order models - see definitions at the bottom
 let db: juggler.DataSource;
@@ -292,6 +294,7 @@ class Order extends Entity {
     .addProperty('description', {type: 'string', required: true})
     .addProperty('customerId', {type: 'number'})
     .addProperty('sellerId', {type: 'number'})
+    .addProperty('customerId', {type: 'number', required: true})
     .addRelation({
       name: 'customer',
       type: RelationType.belongsTo,
@@ -358,23 +361,6 @@ class Customer extends Entity {
       type: RelationType.hasMany,
       source: Customer,
       target: () => Seller,
-      through: () => Order,
-    });
-}
-
-class Seller extends Entity {
-  id: number;
-  name: string;
-  customers: Customer[];
-
-  static definition: ModelDefinition = new ModelDefinition('Seller')
-    .addProperty('id', {type: 'number', id: true})
-    .addProperty('name', {type: 'string', required: true})
-    .addRelation({
-      name: 'customers',
-      type: RelationType.hasMany,
-      source: Seller,
-      target: () => Customer,
       through: () => Order,
     });
 }

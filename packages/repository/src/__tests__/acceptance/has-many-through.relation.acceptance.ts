@@ -42,9 +42,13 @@ describe('HasManyThrough relation', () => {
   });
 
   it('can create an instance of the related model', async () => {
-    const seller = await controller.createCustomerSellers(existingCustomerId, {
-      name: 'Jam Risser',
-    });
+    const seller = await controller.createCustomerSellers(
+      existingCustomerId,
+      {
+        name: 'Jam Risser',
+      },
+      {description: 'some order'},
+    );
     expect(seller.toObject()).to.containDeep({
       name: 'Jam Risser',
     });
@@ -54,14 +58,19 @@ describe('HasManyThrough relation', () => {
   });
 
   it('can find instances of the related model', async () => {
-    const seller = await controller.createCustomerSellers(existingCustomerId, {
-      name: 'Jam Risser',
-    });
+    const seller = await controller.createCustomerSellers(
+      existingCustomerId,
+      {
+        name: 'Jam Risser',
+      },
+      {description: 'some order'},
+    );
     const notMySeller = await controller.createCustomerSellers(
       existingCustomerId + 1,
       {
         name: 'Mark Twain',
       },
+      {description: 'some order'},
     );
     const foundSellers = await controller.findCustomerSellers(
       existingCustomerId,
@@ -85,12 +94,20 @@ describe('HasManyThrough relation', () => {
   });
 
   it('can patch many instances', async () => {
-    await controller.createCustomerSellers(existingCustomerId, {
-      name: 'Jam Risser',
-    });
-    await controller.createCustomerSellers(existingCustomerId, {
-      name: 'Jam Risser',
-    });
+    await controller.createCustomerSellers(
+      existingCustomerId,
+      {
+        name: 'Jam Risser',
+      },
+      {description: 'some order'},
+    );
+    await controller.createCustomerSellers(
+      existingCustomerId,
+      {
+        name: 'Jam Risser',
+      },
+      {description: 'some order'},
+    );
     const patchObject = {name: 'Mark Twain'};
     const arePatched = await controller.patchCustomerSellers(
       existingCustomerId,
@@ -112,12 +129,20 @@ describe('HasManyThrough relation', () => {
   });
 
   it('can delete many instances', async () => {
-    await controller.createCustomerSellers(existingCustomerId, {
-      name: 'Jam Risser',
-    });
-    await controller.createCustomerSellers(existingCustomerId, {
-      name: 'Jam Risser',
-    });
+    await controller.createCustomerSellers(
+      existingCustomerId,
+      {
+        name: 'Jam Risser',
+      },
+      {description: 'some order'},
+    );
+    await controller.createCustomerSellers(
+      existingCustomerId,
+      {
+        name: 'Jam Risser',
+      },
+      {description: 'some order'},
+    );
     const deletedSellers = await controller.deleteCustomerSellers(
       existingCustomerId,
     );
@@ -129,9 +154,13 @@ describe('HasManyThrough relation', () => {
   });
 
   it("does not delete instances that don't belong to the constrained instance", async () => {
-    await controller.createCustomerSellers(existingCustomerId, {
-      name: 'Jam Risser',
-    });
+    await controller.createCustomerSellers(
+      existingCustomerId,
+      {
+        name: 'Jam Risser',
+      },
+      {description: 'some order'},
+    );
     const newSeller = {
       name: 'Mark Twain',
     };
@@ -169,10 +198,11 @@ describe('HasManyThrough relation', () => {
     async createCustomerSellers(
       customerId: number,
       sellerData: Partial<Seller>,
+      orderData?: Partial<Order>,
     ): Promise<Seller> {
       return await this.customerRepository
         .sellers(customerId)
-        .create(sellerData);
+        .create(sellerData, orderData);
     }
 
     async findCustomerSellers(customerId: number) {
