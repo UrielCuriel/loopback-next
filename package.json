@@ -1,75 +1,48 @@
 {
-  "name": "loopback-next",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/strongloop/loopback-next.git"
-  },
-  "version": "0.1.0",
+  "name": "@loopback/repository",
+  "version": "1.10.1",
+  "description": "Repository based persistence for LoopBack 4",
   "engines": {
     "node": ">=8.9"
   },
+  "main": "index",
+  "scripts": {
+    "acceptance": "lb-mocha \"dist/__tests__/acceptance/**/*.js\"",
+    "build": "lb-tsc",
+    "clean": "lb-clean loopback-repository*.tgz dist tsconfig.build.tsbuildinfo package",
+    "pretest": "npm run build",
+    "test": "lb-mocha \"dist/__tests__/**/*.js\"",
+    "verify": "npm pack && tar xf loopback-repository*.tgz && tree package && npm run clean"
+  },
   "author": "IBM Corp.",
+  "copyright.owner": "IBM Corp.",
   "license": "MIT",
   "devDependencies": {
-    "@commitlint/cli": "^8.1.0",
-    "@commitlint/config-conventional": "^8.1.0",
-    "@commitlint/travis-cli": "^8.1.0",
-    "@types/mocha": "^5.2.7",
-    "@typescript-eslint/eslint-plugin": "^1.13.0",
-    "@typescript-eslint/parser": "^1.13.0",
-    "coveralls": "^3.0.6",
-    "cz-conventional-changelog": "^3.0.2",
-    "eslint": "^6.1.0",
-    "eslint-config-prettier": "^6.0.0",
-    "eslint-plugin-eslint-plugin": "^2.1.0",
-    "eslint-plugin-mocha": "^6.0.0",
-    "husky": "^3.0.3",
-    "lerna": "^3.16.4",
-    "typescript": "~3.5.3"
+    "@loopback/build": "^2.0.6",
+    "@loopback/eslint-config": "^3.0.0",
+    "@loopback/testlab": "^1.7.2",
+    "@types/lodash": "^4.14.136",
+    "@types/node": "^10.14.15"
   },
-  "scripts": {
-    "postinstall": "lerna bootstrap",
-    "update-packages": "npm run -s update-package-locks",
-    "prerelease": "npm run build:full && npm run mocha && npm run lint",
-    "release": "lerna version && lerna publish from-git --yes",
-    "update-package-locks": "lerna clean && lerna bootstrap --no-ci",
-    "update-template-deps": "node bin/update-template-deps -f",
-    "update-all-deps": "npm update && lerna exec -- npm update && npm run update-package-locks",
-    "sync-dev-deps": "node bin/sync-dev-deps",
-    "version": "npm run update-packages && git add \"**/package-lock.json\" && npm run update-template-deps",
-    "outdated": "npm outdated --depth 0 && lerna exec --no-bail \"npm outdated --depth 0\"",
-    "tsdocs": "lerna run --scope @loopback/tsdocs build:tsdocs",
-    "coverage:ci": "node packages/build/bin/run-nyc report --reporter=text-lcov | coveralls",
-    "precoverage": "npm test",
-    "coverage": "open coverage/index.html",
-    "lint": "npm run prettier:check && npm run eslint && node bin/check-package-locks",
-    "lint:fix": "npm run eslint:fix && npm run prettier:fix",
-    "eslint": "node packages/build/bin/run-eslint --report-unused-disable-directives --cache .",
-    "eslint:fix": "npm run eslint -- --fix",
-    "prettier:cli": "node packages/build/bin/run-prettier \"**/*.ts\" \"**/*.js\" \"**/*.md\"",
-    "prettier:check": "npm run prettier:cli -- -l",
-    "prettier:fix": "npm run prettier:cli -- --write",
-    "clean": "lerna run clean && node packages/build/bin/run-clean \"packages/*/dist\" \"extensions/*/dist\" \"examples/*/dist\" \"benchmark/dist\"",
-    "clean:lerna": "lerna clean",
-    "build": "node bin/run-lerna run build",
-    "build:full": "npm run clean:lerna && npm install && npm run clean && npm run build",
-    "pretest": "npm run clean && npm run build",
-    "test": "node packages/build/bin/run-nyc npm run mocha --scripts-prepend-node-path",
-    "test:ci": "node packages/build/bin/run-nyc npm run mocha --scripts-prepend-node-path",
-    "verify:docs": "npm run build:site -- --verify",
-    "build:site": "./bin/build-docs-site.sh",
-    "mocha": "node packages/build/bin/run-mocha \"packages/*/dist/__tests__/**/*.js\" \"extensions/*/dist/__tests__/**/*.js\" \"examples/*/dist/__tests__/**/*.js\" \"packages/cli/test/**/*.js\" \"packages/build/test/*/*.js\"",
-    "posttest": "npm run lint"
+  "dependencies": {
+    "@loopback/context": "^1.21.1",
+    "@loopback/core": "^1.9.0",
+    "@types/debug": "^4.1.5",
+    "debug": "^4.1.1",
+    "lodash": "^4.17.15",
+    "loopback-datasource-juggler": "^4.11.0"
   },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
-  "copyright.owner": "IBM Corp.",
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
+  "files": [
+    "README.md",
+    "index.js",
+    "index.d.ts",
+    "dist",
+    "src",
+    "!*/__tests__"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/strongloop/loopback-next.git",
+    "directory": "packages/repository"
   }
 }
