@@ -200,21 +200,21 @@ describe('HasManyThrough relation', () => {
       sellerData: Partial<Seller>,
       orderData?: Partial<Order>,
     ): Promise<Seller> {
-      return await this.customerRepository
+      return this.customerRepository
         .sellers(customerId)
         .create(sellerData, orderData);
     }
 
     async findCustomerSellers(customerId: number) {
-      return await this.customerRepository.sellers(customerId).find();
+      return this.customerRepository.sellers(customerId).find();
     }
 
     async patchCustomerSellers(customerId: number, seller: Partial<Seller>) {
-      return await this.customerRepository.sellers(customerId).patch(seller);
+      return this.customerRepository.sellers(customerId).patch(seller);
     }
 
     async deleteCustomerSellers(customerId: number) {
-      return await this.customerRepository.sellers(customerId).delete();
+      return this.customerRepository.sellers(customerId).delete();
     }
   }
 

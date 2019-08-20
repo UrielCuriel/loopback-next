@@ -69,7 +69,7 @@ export function createThroughConstraint<
   const targetFkName = relationMeta.keyThrough;
   const sourceFkName = relationMeta.keyTo;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let constraint: any = {[sourceFkName]: fkValue};
+  const constraint: any = {[sourceFkName]: fkValue};
   if (targetInstance) {
     constraint[targetFkName] = targetInstance[targetPrimaryKey as keyof Target];
   }

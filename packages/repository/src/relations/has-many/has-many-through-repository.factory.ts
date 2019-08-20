@@ -55,7 +55,6 @@ export function createHasManyThroughRepositoryFactory<
   const meta = resolveHasManyThroughMetadata(relationMetadata);
   debug('Resolved HasManyThrough relation metadata: %o', meta);
   return function(fkValue?: ForeignKeyType) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function getTargetContraint(
       throughInstances: Through[],
     ): DataObject<Target> {
