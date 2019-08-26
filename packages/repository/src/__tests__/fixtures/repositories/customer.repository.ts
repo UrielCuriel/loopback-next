@@ -1,4 +1,4 @@
-// Copyright IBM Corp. 2018,2019. All Rights Reserved.
+// Copyright IBM Corp. 2019. All Rights Reserved.
 // Node module: @loopback/repository
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
@@ -12,8 +12,6 @@ import {
   juggler,
   repository,
 } from '../../..';
-import {Customer, Order, Address, Seller} from '../models';
-import {OrderRepository} from './order.repository';
 import {HasOneRepositoryFactory} from '../../../';
 import {Address, Customer, CustomerRelations, Order, Seller} from '../models';
 import {AddressRepository} from './address.repository';
@@ -33,9 +31,8 @@ export class CustomerRepository extends DefaultCrudRepository<
     Address,
     typeof Customer.prototype.id
   >;
-  public readonly sellers: HasManyThroughRepositoryFactory<
-    Seller,
-    Order,
+  public readonly customers: HasManyRepositoryFactory<
+    Customer,
     typeof Customer.prototype.id
   >;
   public readonly sellers: HasManyThroughRepositoryFactory<
@@ -71,15 +68,13 @@ export class CustomerRepository extends DefaultCrudRepository<
       'address',
       addressRepositoryGetter,
     );
-    this.sellers = this.createHasManyThroughRepositoryFactoryFor(
-      'sellers',
-      sellerRepositoryGetter,
-      orderRepositoryGetter,
+    this.customers = this.createHasManyRepositoryFactoryFor(
+      'customers',
+      Getter.fromValue(this),
     );
-    this.sellers = this.createHasManyThroughRepositoryFactoryFor(
-      'sellers',
-      sellerRepositoryGetter,
-      orderRepositoryGetter,
+    this.parent = this.createBelongsToAccessorFor(
+      'parent',
+      Getter.fromValue(this),
     );
   }
 }

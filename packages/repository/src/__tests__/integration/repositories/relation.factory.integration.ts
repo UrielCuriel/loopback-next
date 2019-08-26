@@ -24,9 +24,6 @@ import {
   juggler,
   ModelDefinition,
   RelationType,
-  createBelongsToAccessor,
-  createHasManyRepositoryFactory,
-  juggler,
 } from '../../..';
 import {Seller} from '../../fixtures/models';
 

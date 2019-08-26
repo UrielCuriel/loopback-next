@@ -10,12 +10,12 @@ import {TypeResolver} from '../type-resolver';
 
 export enum RelationType {
   belongsTo = 'belongsTo',
-  embedsMany = 'embedsMany',
-  embedsOne = 'embedsOne',
-  hasMany = 'hasMany',
   hasOne = 'hasOne',
-  referencesMany = 'referencesMany',
+  hasMany = 'hasMany',
+  embedsOne = 'embedsOne',
+  embedsMany = 'embedsMany',
   referencesOne = 'referencesOne',
+  referencesMany = 'referencesMany',
 }
 
 export interface RelationDefinitionBase {
@@ -140,8 +140,6 @@ export type RelationMetadata =
   | HasManyDefinition
   | HasManyThroughDefinition
   | BelongsToDefinition
-  | HasManyDefinition
-  | HasManyThroughDefinition
   | HasOneDefinition
   // TODO(bajtos) add other relation types and remove RelationDefinitionBase once
   // all relation types are covered.

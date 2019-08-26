@@ -18,9 +18,9 @@ export class Order extends Entity {
 
   @property({
     type: 'string',
-    required: false,
+    required: true,
   })
-  description?: string;
+  description: string;
 
   @property({
     type: 'boolean',
