@@ -6,11 +6,10 @@ sidebar: lb4_sidebar
 permalink: /doc/en/lb4/HasMany-relation.html
 ---
 
-## Warning: EXPIRMENTAL
-
-The underlying implementation may change in the near future.
+{% include important.html content="The underlying implementation may change in the near future.
 If some of the changes break backward-compatibility a semver-major may not
 be released.
+" %}
 
 ## Overview
 
