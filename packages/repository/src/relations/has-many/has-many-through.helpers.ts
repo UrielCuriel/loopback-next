@@ -38,13 +38,13 @@ export function createTargetConstraint<
 ): DataObject<Target> {
   const {targetPrimaryKey} = relationMeta;
   const targetFkName = relationMeta.keyThrough;
+  const fkValues = throughInstances.map(
+    (throughInstance: Through) =>
+      throughInstance[targetFkName as keyof Through],
+  );
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const constraint: any = {
-    or: throughInstances.map((throughInstance: Through) => {
-      return {
-        [targetPrimaryKey]: throughInstance[targetFkName as keyof Through],
-      };
-    }),
+    [targetPrimaryKey]: fkValues.length === 1 ? fkValues[0] : {inq: fkValues},
   };
   return constraint;
 }
