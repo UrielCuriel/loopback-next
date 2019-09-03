@@ -262,6 +262,10 @@ export class DefaultCrudRepository<
   }
 
   /**
+   * EXPIRMENTAL: The underlying implementation may change in the near future.
+   * If some of the changes break backward-compatibility a semver-major may not
+   * be released.
+   *
    * Function to create a constrained relation repository factory
    *
    * ```ts

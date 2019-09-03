@@ -6,6 +6,12 @@ sidebar: lb4_sidebar
 permalink: /doc/en/lb4/HasMany-relation.html
 ---
 
+## Warning: EXPIRMENTAL
+
+The underlying implementation may change in the near future.
+If some of the changes break backward-compatibility a semver-major may not
+be released.
+
 ## Overview
 
 A `hasManyThrough` relation sets up a many-to-many connection with another model. This relation indicates that the declaring model can be matched with zero or more instances of another model by proceeding through a third model. For example, in an application for a medical practice where patients make appointments to see physicians, the relevant relation declarations might be:
