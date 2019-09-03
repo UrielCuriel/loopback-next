@@ -11,13 +11,16 @@ import {
   juggler,
   repository,
   RepositoryMixin,
-} from '../..';
-import {Order, Seller} from '../fixtures/models';
+} from '@loopback/repository';
+import {
+  Order,
+  Seller,
+} from '@loopback/repository/src/__tests__/fixtures/models';
 import {
   CustomerRepository,
   OrderRepository,
   SellerRepository,
-} from '../fixtures/repositories';
+} from '@loopback/repository/src/__tests__/fixtures/repositories';
 
 describe('HasManyThrough relation', () => {
   // Given a Customer and Seller models - see definitions at the bottom
