@@ -26,13 +26,13 @@
     "fs-extra": "^8.1.0",
     "oas-validator": "^3.3.1",
     "should": "^13.2.3",
-    "sinon": "^7.4.0",
+    "sinon": "^7.4.2",
     "supertest": "^4.0.2"
   },
   "devDependencies": {
     "@loopback/build": "^2.0.8",
     "@loopback/eslint-config": "^4.0.1",
-    "@types/node": "^10.14.16"
+    "@types/node": "^10.14.17"
   },
   "files": [
     "README.md",
