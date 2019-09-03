@@ -41,14 +41,22 @@ export interface HasManyThroughRepository<
    * @param options - Options for the operation
    * @returns A promise which resolves with the found target instance(s)
    */
-  find(filter?: Filter<Target>, options?: Options): Promise<Target[]>;
+  find(
+    filter?: Filter<Target>,
+    options?: Options,
+    throughOptions?: Options,
+  ): Promise<Target[]>;
   /**
    * Delete multiple target model instances
    * @param where - Instances within the where scope are deleted
    * @param options
    * @returns A promise which resolves the deleted target model instances
    */
-  delete(where?: Where<Target>, options?: Options): Promise<Count>;
+  delete(
+    where?: Where<Target>,
+    options?: Options,
+    throughOptions?: Options,
+  ): Promise<Count>;
   /**
    * Patch multiple target model instances
    * @param dataObject - The fields and their new values to patch
@@ -60,6 +68,7 @@ export interface HasManyThroughRepository<
     dataObject: DataObject<Target>,
     where?: Where<Target>,
     options?: Options,
+    throughOptions?: Options,
   ): Promise<Count>;
 }
 
@@ -115,13 +124,14 @@ export class DefaultHasManyThroughRepository<
   async find(
     filter?: Filter<TargetEntity>,
     options?: Options,
+    throughOptions?: Options,
   ): Promise<TargetEntity[]> {
     const targetRepository = await this.getTargetRepository();
     const throughRepository = await this.getThroughRepository();
     const throughConstraint = this.getThroughConstraint();
     const throughInstances = await throughRepository.find(
       constrainFilter(undefined, throughConstraint),
-      options,
+      throughOptions,
     );
     const targetConstraint = this.getTargetConstraint(throughInstances);
     return targetRepository.find(
@@ -130,13 +140,17 @@ export class DefaultHasManyThroughRepository<
     );
   }
 
-  async delete(where?: Where<TargetEntity>, options?: Options): Promise<Count> {
+  async delete(
+    where?: Where<TargetEntity>,
+    options?: Options,
+    throughOptions?: Options,
+  ): Promise<Count> {
     const targetRepository = await this.getTargetRepository();
     const throughRepository = await this.getThroughRepository();
     const throughConstraint = this.getThroughConstraint();
     const throughInstances = await throughRepository.find(
       constrainFilter(undefined, throughConstraint),
-      options,
+      throughOptions,
     );
     const targetConstraint = this.getTargetConstraint(throughInstances);
     return targetRepository.deleteAll(
@@ -149,13 +163,14 @@ export class DefaultHasManyThroughRepository<
     dataObject: DataObject<TargetEntity>,
     where?: Where<TargetEntity>,
     options?: Options,
+    throughOptions?: Options,
   ): Promise<Count> {
     const targetRepository = await this.getTargetRepository();
     const throughRepository = await this.getThroughRepository();
     const throughConstraint = this.getThroughConstraint();
     const throughInstances = await throughRepository.find(
       constrainFilter(undefined, throughConstraint),
-      options,
+      throughOptions,
     );
     const targetConstraint = this.getTargetConstraint(throughInstances);
     return targetRepository.updateAll(
