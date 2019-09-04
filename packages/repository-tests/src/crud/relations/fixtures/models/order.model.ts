@@ -1,9 +1,17 @@
 // Copyright IBM Corp. 2019. All Rights Reserved.
-// Node module: @loopback/repository
+// Node module: @loopback/repository-tests
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {belongsTo, Entity, model, property} from '../../..';
+import {
+  belongsTo,
+  BelongsToAccessor,
+  Entity,
+  EntityCrudRepository,
+  model,
+  property,
+} from '@loopback/repository';
+import {MixedIdType} from '../../../../helpers.repository-tests';
 import {Customer, CustomerWithRelations} from './customer.model';
 import {Shipment, ShipmentWithRelations} from './shipment.model';
 import {Seller} from './seller.model';
@@ -11,10 +19,10 @@ import {Seller} from './seller.model';
 @model()
 export class Order extends Entity {
   @property({
-    type: 'string',
     id: true,
+    generated: true,
   })
-  id: string;
+  id: MixedIdType;
 
   @property({
     type: 'string',
@@ -29,13 +37,13 @@ export class Order extends Entity {
   isShipped: boolean;
 
   @belongsTo(() => Customer)
-  customerId: number;
+  customerId: MixedIdType;
 
   @belongsTo(() => Seller)
   sellerId: number;
 
   @belongsTo(() => Shipment, {name: 'shipment'})
-  shipment_id: number;
+  shipment_id: MixedIdType;
 }
 
 export interface OrderRelations {
@@ -44,3 +52,10 @@ export interface OrderRelations {
 }
 
 export type OrderWithRelations = Order & OrderRelations;
+
+export interface OrderRepository
+  extends EntityCrudRepository<Order, typeof Order.prototype.id> {
+  // define additional members like relation methods here
+  customer: BelongsToAccessor<Customer, MixedIdType>;
+  shipment: BelongsToAccessor<Shipment, MixedIdType>;
+}

@@ -15,17 +15,17 @@
     "@commitlint/config-conventional": "^8.1.0",
     "@commitlint/travis-cli": "^8.1.0",
     "@types/mocha": "^5.2.7",
-    "@typescript-eslint/eslint-plugin": "^2.0.0",
-    "@typescript-eslint/parser": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.1.0",
+    "@typescript-eslint/parser": "^2.1.0",
     "coveralls": "^3.0.6",
     "cz-conventional-changelog": "^3.0.2",
     "eslint": "^6.3.0",
-    "eslint-config-prettier": "^6.1.0",
+    "eslint-config-prettier": "^6.2.0",
     "eslint-plugin-eslint-plugin": "^2.1.0",
     "eslint-plugin-mocha": "^6.1.0",
     "husky": "^3.0.5",
     "lerna": "^3.16.4",
-    "typescript": "~3.5.3"
+    "typescript": "~3.6.2"
   },
   "scripts": {
     "postinstall": "lerna bootstrap",
