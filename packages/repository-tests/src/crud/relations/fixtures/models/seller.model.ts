@@ -3,7 +3,7 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {hasMany, Entity, model, property} from '../../..';
+import {hasMany, Entity, model, property} from '@loopback/repository';
 import {Customer} from './customer.model';
 import {Order} from './order.model';
 

@@ -3,7 +3,6 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {expect} from '@loopback/testlab';
 import {
   BelongsToAccessor,
   BelongsToDefinition,
@@ -18,14 +17,15 @@ import {
   HasManyDefinition,
   HasManyRepository,
   HasManyRepositoryFactory,
-  HasManyThroughRepository,
   HasManyThroughDefinition,
+  HasManyThroughRepository,
   HasManyThroughRepositoryFactory,
   juggler,
   ModelDefinition,
   RelationType,
-} from '../../..';
-import {Seller} from '../../fixtures/models';
+} from '@loopback/repository';
+import {expect} from '@loopback/testlab';
+import {Seller} from '../fixtures/models';
 
 // Given a Customer and Order models - see definitions at the bottom
 let db: juggler.DataSource;
